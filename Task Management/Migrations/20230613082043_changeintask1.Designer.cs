@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Task_Management.Data;
 
@@ -10,35 +11,15 @@ using Task_Management.Data;
 namespace Task_Management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230613082043_changeintask1")]
+    partial class changeintask1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
-                {
-                    b.Property<int>("AsTId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AsTId");
-
-                    b.HasIndex("TaskId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("assignedto");
-                });
 
             modelBuilder.Entity("Task_Management.Models.Roles", b =>
                 {
@@ -115,6 +96,9 @@ namespace Task_Management.Migrations
                     b.Property<int>("RoleID")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TaskId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -123,26 +107,9 @@ namespace Task_Management.Migrations
 
                     b.HasIndex("RoleID");
 
+                    b.HasIndex("TaskId");
+
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
-                {
-                    b.HasOne("Task_Management.Models.Task", "task")
-                        .WithMany("AssignedToUsers")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Task_Management.Models.User", "AssignUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AssignUser");
-
-                    b.Navigation("task");
                 });
 
             modelBuilder.Entity("Task_Management.Models.Task", b =>
@@ -163,6 +130,10 @@ namespace Task_Management.Migrations
                         .HasForeignKey("RoleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Task_Management.Models.Task", null)
+                        .WithMany("AssignedToUsers")
+                        .HasForeignKey("TaskId");
 
                     b.Navigation("Roles");
                 });

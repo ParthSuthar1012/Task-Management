@@ -19,9 +19,7 @@ namespace Task_Management.Models
         [Required]
         public Priority Priority { get; set; }
    
-        [ForeignKey("AssignedToUser")]
-        public int AssignedTo { get; set; }
-        public User AssignedToUser { get; set; }
+        
 
         [ForeignKey("CreatedByUser")]
         public int CreatedBy { get; set; }
@@ -29,5 +27,7 @@ namespace Task_Management.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set;}
+
+        public List<Assignedto> AssignedToUsers { get; set; }
     }
 }

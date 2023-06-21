@@ -15,9 +15,8 @@ namespace Task_Management.Models.NewFolder
         [Required]
         public Priority Priority { get; set; }
         [Required]
-        public int AssignedTo { get; set; }
-        [Required]
-        public int CreatedBy { get; set; }
+        public ICollection<AsssigntoVM> AssignedTo { get; set; }
+   
    
     }
 }
