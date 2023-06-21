@@ -11,8 +11,8 @@ using Task_Management.Data;
 namespace Task_Management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230612062738_Intial")]
-    partial class Intial
+    [Migration("20230621054955_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,27 @@ namespace Task_Management.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
+                {
+                    b.Property<int>("AssignedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AssignedId");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("assignedto");
+                });
 
             modelBuilder.Entity("Task_Management.Models.Roles", b =>
                 {
@@ -42,14 +63,11 @@ namespace Task_Management.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("AssignedTo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CratedBy")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -71,12 +89,9 @@ namespace Task_Management.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("TaskId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("tasks");
                 });
@@ -91,14 +106,15 @@ namespace Task_Management.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RolesRoleID")
+                    b.Property<int>("RoleID")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
@@ -107,31 +123,55 @@ namespace Task_Management.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("RolesRoleID");
+                    b.HasIndex("RoleID");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Task_Management.Models.Task", b =>
+            modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
                 {
-                    b.HasOne("Task_Management.Models.User", "User")
+                    b.HasOne("Task_Management.Models.Task", "task")
+                        .WithMany("AssignedToUsers")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Task_Management.Models.User", "AssignUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("AssignUser");
+
+                    b.Navigation("task");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.Task", b =>
+                {
+                    b.HasOne("Task_Management.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("Task_Management.Models.User", b =>
                 {
                     b.HasOne("Task_Management.Models.Roles", "Roles")
                         .WithMany()
-                        .HasForeignKey("RolesRoleID")
+                        .HasForeignKey("RoleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Roles");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.Task", b =>
+                {
+                    b.Navigation("AssignedToUsers");
                 });
 #pragma warning restore 612, 618
         }

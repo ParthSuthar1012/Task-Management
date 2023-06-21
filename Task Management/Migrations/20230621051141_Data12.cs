@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Task_Management.Migrations
 {
-    public partial class Intial : Migration
+    public partial class Data12 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,21 +34,22 @@ namespace Task_Management.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Password = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    RolesRoleID = table.Column<int>(type: "int", nullable: false)
+                    RoleID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_RolesRoleID",
-                        column: x => x.RolesRoleID,
+                        name: "FK_Users_Roles_RoleID",
+                        column: x => x.RoleID,
                         principalTable: "Roles",
                         principalColumn: "RoleID",
                         onDelete: ReferentialAction.Cascade);
@@ -69,8 +70,7 @@ namespace Task_Management.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
                     AssignedTo = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    CratedBy = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
@@ -78,8 +78,14 @@ namespace Task_Management.Migrations
                 {
                     table.PrimaryKey("PK_tasks", x => x.TaskId);
                     table.ForeignKey(
-                        name: "FK_tasks_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_tasks_Users_AssignedTo",
+                        column: x => x.AssignedTo,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_tasks_Users_CreatedBy",
+                        column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -87,14 +93,19 @@ namespace Task_Management.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tasks_UserId",
+                name: "IX_tasks_AssignedTo",
                 table: "tasks",
-                column: "UserId");
+                column: "AssignedTo");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_RolesRoleID",
+                name: "IX_tasks_CreatedBy",
+                table: "tasks",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RoleID",
                 table: "Users",
-                column: "RolesRoleID");
+                column: "RoleID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

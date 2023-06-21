@@ -14,7 +14,8 @@ namespace Task_Management.Data
         public DbSet<Roles> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Models.Task> tasks { get; set; }
-        public DbSet<Assignedto> assignedto { get; set; }
+        public DbSet<Assignedto> AssignedUser { get; set; }
+     
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

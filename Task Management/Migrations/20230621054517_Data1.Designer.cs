@@ -11,8 +11,8 @@ using Task_Management.Data;
 namespace Task_Management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230612063834_change")]
-    partial class change
+    [Migration("20230621054517_Data1")]
+    partial class Data1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,27 @@ namespace Task_Management.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
+                {
+                    b.Property<int>("AsTId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AsTId");
+
+                    b.HasIndex("TaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("assignedto");
+                });
 
             modelBuilder.Entity("Task_Management.Models.Roles", b =>
                 {
@@ -40,9 +61,6 @@ namespace Task_Management.Migrations
                 {
                     b.Property<int>("TaskId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("AssignedTo")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -73,8 +91,6 @@ namespace Task_Management.Migrations
 
                     b.HasKey("TaskId");
 
-                    b.HasIndex("AssignedTo");
-
                     b.HasIndex("CreatedBy");
 
                     b.ToTable("tasks");
@@ -87,6 +103,10 @@ namespace Task_Management.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -108,21 +128,32 @@ namespace Task_Management.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Task_Management.Models.Task", b =>
+            modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
                 {
-                    b.HasOne("Task_Management.Models.User", "AssignedToUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedTo")
+                    b.HasOne("Task_Management.Models.Task", "task")
+                        .WithMany("AssignedToUsers")
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Task_Management.Models.User", "AssignUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignUser");
+
+                    b.Navigation("task");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.Task", b =>
+                {
                     b.HasOne("Task_Management.Models.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AssignedToUser");
 
                     b.Navigation("CreatedByUser");
                 });
@@ -136,6 +167,11 @@ namespace Task_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Roles");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.Task", b =>
+                {
+                    b.Navigation("AssignedToUsers");
                 });
 #pragma warning restore 612, 618
         }

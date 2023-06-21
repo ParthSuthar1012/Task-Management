@@ -37,8 +37,8 @@ namespace Task_Management.Controllers
                 return Unauthorized();
             var role = await _context.Roles.FirstOrDefaultAsync(a=>a.RoleID==user.RoleID);  
             // Check if the user has the necessary role
-            if (role.RoleName != "Developer" && role.RoleName != "Manager")
-                return Forbid();
+          /*  if (role.RoleName != "Developer" && role.RoleName != "Manager")
+                return Forbid();*/
 
             var task = new Models.Task
             {
@@ -50,8 +50,8 @@ namespace Task_Management.Controllers
                 CreatedBy =user.UserId,
                 CreatedAt = DateTime.Now,
             };
-            _context.tasks.Add(task);
-            await _context.SaveChangesAsync();
+         //   _context.tasks.Add(task);
+       //     await _context.SaveChangesAsync();
 
             var assignUser = new List<Assignedto>();
 
@@ -62,15 +62,16 @@ namespace Task_Management.Controllers
                 {
                     return BadRequest("User Not Found");
                 }
-                var assignto = new Assignedto { UserId = assignedUserId.UserId, TaskId= task.TaskId };
+                var assignto = new Assignedto { UserId = assignedUserId.UserId };
              assignUser.Add(assignto);
               
               task.AssignedToUsers = assignUser;
             }
-            _context.tasks.Update(task);
+            _context.tasks.Add(task);
+         //   _context.tasks.Update(task);
             await _context.SaveChangesAsync();
 
-            return Ok(task);
+            return Ok("order added Successfully.");
         }
     }
 }

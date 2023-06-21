@@ -11,8 +11,8 @@ using Task_Management.Data;
 namespace Task_Management.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230612063642_changes")]
-    partial class changes
+    [Migration("20230621051141_Data12")]
+    partial class Data12
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -90,12 +90,13 @@ namespace Task_Management.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("RoleID")
                         .HasColumnType("int");

@@ -8,7 +8,7 @@ namespace Task_Management.Models
     public class Assignedto
     {
         [Key]
-        public int AsTId { get; set; }
+        public int AssignedId { get; set; }
     
         public int TaskId { get; set; }
         [ForeignKey("TaskId")]

@@ -21,7 +21,7 @@ namespace Task_Management.Migrations
 
             modelBuilder.Entity("Task_Management.Models.Assignedto", b =>
                 {
-                    b.Property<int>("AsTId")
+                    b.Property<int>("AssignedId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -31,13 +31,13 @@ namespace Task_Management.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("AsTId");
+                    b.HasKey("AssignedId");
 
                     b.HasIndex("TaskId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("assignedto");
+                    b.ToTable("AssignedUser");
                 });
 
             modelBuilder.Entity("Task_Management.Models.Roles", b =>
