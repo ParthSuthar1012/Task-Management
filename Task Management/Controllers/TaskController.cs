@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Task_Management.Data;
 using Task_Management.Models;
 using Task_Management.Models.NewFolder;
+using Task = Task_Management.Models.Task;
 
 namespace Task_Management.Controllers
 {
@@ -21,6 +22,7 @@ namespace Task_Management.Controllers
             _context = context;
         }
 
+        
 
         [HttpPost]
         [Route("AddTask")]
@@ -85,9 +87,8 @@ namespace Task_Management.Controllers
         [HttpGet]
         [Route("GetTask")]
         [Authorize]
-        public async Task<IActionResult> GetTask()
+        public async Task<IActionResult> GetTask(string? Data)
         {
-
             var claimIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
             var username = claim.Value;
@@ -100,16 +101,28 @@ namespace Task_Management.Controllers
           
             {
                 var Assigned = await _context.AssignedUser.Where(a => a.UserId == user.UserId).ToListAsync();
-                 list = await _context.tasks.Include(o => o.AssignedToUsers).ThenInclude(oa => oa.AssignUser).Where(u => u.CreatedByUser.UserId == user.UserId).ToListAsync();
-                if (Assigned.Count() > 0)
+                list = await _context.tasks.Include(o => o.AssignedToUsers).ThenInclude(oa => oa.AssignUser).Where(u => u.CreatedByUser.UserId == user.UserId).ToListAsync();             
+               
+                if (Assigned.Count() > 0 && Data != "Created")
                 {
+                 
                     foreach (var item in Assigned)
                     {
                         var dataList = await _context.tasks.Include(o => o.CreatedByUser).FirstOrDefaultAsync(u => u.TaskId == item.TaskId);
                         list.Add(dataList);
+                     
                     }
                 }
+
+                if (Data == "Assigned")
+                {
+                    list.RemoveAll(a => a.CreatedByUser.UserName == user.UserName);
+                }
+
             }
+
+       
+
 
             var FinalList = list.Select(u => new 
            {
@@ -123,7 +136,8 @@ namespace Task_Management.Controllers
                AssignedToUsers=u.AssignedToUsers.Select(o=>o.AssignUser.UserName).ToList(),
                CreatedAt=u.CreatedAt,
             });
-           return Ok(FinalList);
+
+            return Ok(FinalList);
           
         }
     }
