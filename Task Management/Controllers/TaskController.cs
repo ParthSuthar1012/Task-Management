@@ -121,9 +121,6 @@ namespace Task_Management.Controllers
 
             }
 
-       
-
-
             var FinalList = list.Select(u => new 
            {
                TaskId=u.TaskId,
