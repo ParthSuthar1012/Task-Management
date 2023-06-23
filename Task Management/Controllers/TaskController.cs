@@ -92,20 +92,24 @@ namespace Task_Management.Controllers
             var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
             var username = claim.Value;
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            var userRole = await _context.Roles.FirstOrDefaultAsync(a => a.RoleID == user.RoleID);
+            var list = await _context.tasks.Include(o => o.AssignedToUsers).ThenInclude(oa => oa.AssignUser).ToListAsync();
             if (user == null)
                 return Unauthorized();
-        
+            if (userRole.RoleName != "Admin")
           
-            var Assigned = await _context.AssignedUser.Where(a => a.UserId == user.UserId).ToListAsync();
-            var list = await _context.tasks.Include(o=>o.AssignedToUsers).ThenInclude(oa=>oa.AssignUser).Where(u=>u.CreatedByUser.UserId==user.UserId).ToListAsync();
-             if(Assigned.Count() > 0)
-             {
-              foreach(var item in Assigned)
-                 {
-                     var dataList= await _context.tasks.Include(o => o.CreatedByUser).FirstOrDefaultAsync(u => u.TaskId == item.TaskId);
-                     list.Add(dataList);                              
-                 }
-             }
+            {
+                var Assigned = await _context.AssignedUser.Where(a => a.UserId == user.UserId).ToListAsync();
+                 list = await _context.tasks.Include(o => o.AssignedToUsers).ThenInclude(oa => oa.AssignUser).Where(u => u.CreatedByUser.UserId == user.UserId).ToListAsync();
+                if (Assigned.Count() > 0)
+                {
+                    foreach (var item in Assigned)
+                    {
+                        var dataList = await _context.tasks.Include(o => o.CreatedByUser).FirstOrDefaultAsync(u => u.TaskId == item.TaskId);
+                        list.Add(dataList);
+                    }
+                }
+            }
 
             var FinalList = list.Select(u => new 
            {
