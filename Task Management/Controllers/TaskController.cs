@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using NuGet.Protocol;
+using System.Collections.Generic;
 using System.Security.Claims;
 using Task_Management.Data;
 using Task_Management.Models;
@@ -137,6 +139,71 @@ namespace Task_Management.Controllers
             return Ok(FinalList);
           
         }
-    }
+
+
+        [HttpGet]
+        [Route("GetTaskById")]
+        [Authorize]
+        public async Task<IActionResult> GetTaskById(int? id)
+        {
+
+       
+            var task = await _context.tasks.Include(o => o.CreatedByUser).Include(o => o.AssignedToUsers).ThenInclude(oa => oa.AssignUser).ThenInclude(aa=>aa.Roles).FirstOrDefaultAsync(u => u.TaskId == id);
+            if (task == null)
+            { 
+                return NotFound();
+            }
+            var date = task.DueDate;
+            var today=DateTime.Now;
+            var rd = date - today;
+        var remains=rd.Days.ToString();
+            if (rd.Days < 0)
+            {
+                remains = "Due Date is Passed";
+            }
+
+                var FinalList = new
+                {
+                    TaskId = task.TaskId,
+                    Title = task.Title,
+                    Description = task.Description,
+                    DueDate = task.DueDate,
+                    RemainingDays = remains,
+                    Status = task.Status.ToString(),
+                    Priority = task.Priority.ToString(),
+                    CreatedBy = task.CreatedByUser.Name.ToString(),
+                    AssignedToUsers = task.AssignedToUsers.Select(o =>new { o.AssignUser.Name,o.AssignUser.Roles.RoleName}).ToList(),            
+            };
+            return Ok(FinalList);                   
+        }
+
+        [HttpPost]
+        [Route("AssignedToUsers")]
+        [Authorize]
+        public async Task<IActionResult> AssignedToUsers(int? id, AsssigntoVM[] DataId)
+        {
+            var claimIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var username = claim.Value;
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+
+            var data= _context.tasks.FirstOrDefault(o=>o.TaskId == id && o.CreatedByUser.UserId==user.UserId);
+            if (data == null) { return NotFound(); }
+
+            foreach (var item in DataId)
+            {
+                var assUser = new Assignedto
+                {
+                    UserId = item.UserId,
+                   TaskId=data.TaskId
+
+                };
+                _context.AssignedUser.Add(assUser);
+              
+            }
+            _context.SaveChanges();
+            return Ok("Task is Assigned To users.");
+        }
+        }
 
 }
